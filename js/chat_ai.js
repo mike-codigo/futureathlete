@@ -505,7 +505,7 @@ function generatePDF(conversation) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer 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'
+          'Authorization': 'Bearer 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'
         },
         body: JSON.stringify({
           model: "meta-llama/llama-4-maverick-17b-128e-instruct", // Primeiro modelo a ser tentado
