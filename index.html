@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,14 +12,17 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="./js/chat_ai.js"></script>
+    <script src="./js/whatsapp_integration.js"></script>
+    <script src="./js/chat_ai_production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.4/dist/purify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.14/bundle/libphonenumber-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
+
     <style>
         :root {
             --primary: #00ff88;
@@ -27,19 +31,24 @@
             --light: #f8f9fa;
             --gray: #2d2d2d;
         }
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--dark);
             color: var(--light);
             overflow-x: hidden;
         }
-        
-        h1, h2, h3, h4, h5, h6 {
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-family: 'Bebas Neue', sans-serif;
             letter-spacing: 1px;
         }
-        
+
         .glass-card {
             background: rgba(45, 45, 45, 0.5);
             backdrop-filter: blur(10px);
@@ -47,34 +56,37 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
         }
-        
+
         .neon-text {
             text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary);
         }
+
         .neon-text-orange {
             text-shadow: 0 0 5px var(--secondary), 0 0 10px var(--secondary);
         }
-        
+
         .neon-border {
             box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
         }
-        
+
         .pulse {
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
             0% {
                 box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
             }
+
             70% {
                 box-shadow: 0 0 0 10px rgba(0, 255, 136, 0);
             }
+
             100% {
                 box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
             }
         }
-        
+
         .home {
             height: 90vh;
             display: flex;
@@ -89,12 +101,12 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
-        
+
         .athlete-card:hover .athlete-image {
             transform: translateY(-10px);
             filter: drop-shadow(0 10px 20px rgba(0, 255, 136, 0.5));
         }
-        
+
         #threejs-container {
             width: 50%;
             height: 100%;
@@ -103,11 +115,11 @@
         }
 
         .character-athlete {
-            width: 100%; 
+            width: 100%;
             height: 100%;
             margin: auto auto 0px auto;
         }
-        
+
         .model-viewer {
             width: 100%;
             height: 100%;
@@ -151,14 +163,16 @@
                 transform: scale(1);
                 opacity: 1;
             }
+
             50% {
                 transform: scale(1.05);
                 opacity: 0.8;
             }
+
             100% {
                 transform: scale(1);
                 opacity: 1;
-        }
+            }
         }
 
         @keyframes spin {
@@ -166,6 +180,7 @@
                 transform: rotate(360deg);
             }
         }
+
         .scroll-down {
             position: absolute;
             bottom: 30px;
@@ -173,28 +188,35 @@
             transform: translateX(-50%);
             animation: bounce 2s infinite;
         }
-        
+
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
                 transform: translateY(0) translateX(-50%);
             }
+
             40% {
                 transform: translateY(-20px) translateX(-50%);
             }
+
             60% {
                 transform: translateY(-10px) translateX(-50%);
             }
         }
-        
+
         .service-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .equipment-card {
             transition: all 0.3s ease;
         }
-        
+
         .equipment-card:hover {
             transform: scale(1.05);
             z-index: 10;
@@ -204,7 +226,7 @@
             border-radius: 20px;
             position: relative;
         }
-        
+
         .chat-bubble:after {
             content: '';
             position: absolute;
@@ -214,17 +236,17 @@
             border-style: solid;
             border-color: var(--gray) transparent;
         }
-        
+
         .plan-card:hover {
             transform: scale(1.03);
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
         }
-        
+
         .highlight {
             position: relative;
             display: inline-block;
         }
-        
+
         .highlight:after {
             content: '';
             position: absolute;
@@ -239,153 +261,160 @@
 
         /* Card Esportes Scroll*/
         .carousel-container {
-        background-color: #394730;
-        position: relative;
-        overflow: hidden;
-        width: 100vw;
-        margin: -5rem 0 1.5rem -1rem;
-        padding: 80px 0 40px;
-        cursor: grab;
+            background-color: #394730;
+            position: relative;
+            overflow: hidden;
+            width: 100vw;
+            margin: -5rem 0 1.5rem -1rem;
+            padding: 80px 0 40px;
+            cursor: grab;
         }
-        
+
         .carousel-container.is-dragging {
-        cursor: grabbing;
+            cursor: grabbing;
         }
-        
+
         .carousel {
-        display: flex;
-        overflow: visible;
+            display: flex;
+            overflow: visible;
         }
-        
+
         .card {
-        min-width: 260px;
-        height: 270px;
-        margin: 0 15px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 25px;
-        overflow: visible;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-width: 260px;
+            height: 270px;
+            margin: 0 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            overflow: visible;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
         }
-        
+
         .card-image {
-        position: absolute;
-        top: -60px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 120px;
-        height: 120px;
-        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.4));
-        transition: transform 0.3s ease;
-        z-index: 10;
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.4));
+            transition: transform 0.3s ease;
+            z-index: 10;
         }
-        
+
         .card:hover .card-image {
-        transform: translateX(-50%) rotate(15deg) scale(1.1);
+            transform: translateX(-50%) rotate(15deg) scale(1.1);
         }
-        
+
         .card h2 {
-        color: #FF8C00;
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 2rem;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
-        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            color: #FF8C00;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
-        
+
         .card p {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.95rem;
-        line-height: 1.4;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
-        
+
         .gradient-overlay-left,
         .gradient-overlay-right {
-        position: absolute;
-        top: 0;
-        height: 100%;
-        width: 100px;
-        pointer-events: none;
-        z-index: 5;
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 100px;
+            pointer-events: none;
+            z-index: 5;
         }
-        
+
         .gradient-overlay-left {
-        left: 0;
-        background: linear-gradient(to right, #333, rgba(51, 51, 51, 0));
+            left: 0;
+            background: linear-gradient(to right, #333, rgba(51, 51, 51, 0));
         }
-        
+
         .gradient-overlay-right {
-        right: 0;
-        background: linear-gradient(to left, #333, rgba(51, 51, 51, 0));
+            right: 0;
+            background: linear-gradient(to left, #333, rgba(51, 51, 51, 0));
         }
-        
+
         .bg-pattern {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: 
-            linear-gradient(45deg, rgba(34, 139, 34, 0.1) 25%, transparent 25%),
-            linear-gradient(-45deg, rgba(34, 139, 34, 0.1) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, rgba(34, 139, 34, 0.1) 75%),
-            linear-gradient(-45deg, transparent 75%, rgba(34, 139, 34, 0.1) 75%);
-        background-size: 20px 20px;
-        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        z-index: -1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(45deg, rgba(34, 139, 34, 0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(34, 139, 34, 0.1) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(34, 139, 34, 0.1) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(34, 139, 34, 0.1) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            z-index: -1;
         }
     </style>
     <style>
         /* Animação para o indicador de digitação */
         @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
-        
+
         .animate-pulse {
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         .delay-75 {
             animation-delay: 0.2s;
         }
-        
+
         .delay-150 {
             animation-delay: 0.4s;
         }
-        
+
         /* Estilo para o scroll do chat */
         * {
             scrollbar-width: thin;
             scrollbar-color: rgba(74, 222, 128, 0.5) rgba(31, 41, 55, 0.5);
         }
-        
+
         #chat_ai .space-y-2::-webkit-scrollbar {
             width: 6px;
         }
-        
+
         #chat_ai .space-y-2::-webkit-scrollbar-track {
             background: rgba(31, 41, 55, 0.5);
             border-radius: 10px;
         }
-        
+
         #chat_ai .space-y-2::-webkit-scrollbar-thumb {
             background-color: rgba(74, 222, 128, 0.5);
             border-radius: 10px;
         }
-        
+
         /* Estilos para Markdown */
         .markdown h1 {
             font-size: 1.5em;
@@ -394,7 +423,7 @@
             margin-bottom: 0.5em;
             color: #4ade80;
         }
-        
+
         .markdown h2 {
             font-size: 1.3em;
             font-weight: bold;
@@ -402,7 +431,7 @@
             margin-bottom: 0.5em;
             color: #4ade80;
         }
-        
+
         .markdown h3 {
             font-size: 1.15em;
             font-weight: bold;
@@ -418,19 +447,19 @@
             margin-bottom: 0.5em;
             color: #333;
         }
-        
+
         .markdown ul {
             list-style-type: disc;
             padding-left: 1.5em;
             margin: 0.5em 0;
         }
-        
+
         .markdown ol {
             list-style-type: decimal;
             padding-left: 1.5em;
             margin: 0.5em 0;
         }
-        
+
         .markdown li {
             margin-bottom: 0.3em;
             font-size: 0.9em;
@@ -448,30 +477,31 @@
                 font-size: 0.85em;
             }
         }
-        
+
         .markdown table {
             border-collapse: collapse;
             width: 100%;
             margin: 1em 0;
         }
-        
-        .markdown th, .markdown td {
+
+        .markdown th,
+        .markdown td {
             border: 1px solid #4ade80;
             padding: 0.5em;
             text-align: left;
         }
-        
+
         .markdown th {
             background-color: rgba(74, 222, 128, 0.2);
         }
-        
+
         .markdown code {
             background-color: rgba(31, 41, 55, 0.5);
             padding: 0.2em 0.4em;
             border-radius: 3px;
             font-family: monospace;
         }
-        
+
         .markdown blockquote {
             border-left: 3px solid #4ade80;
             padding-left: 1em;
@@ -479,12 +509,12 @@
             font-style: italic;
             color: #d1d5db;
         }
-        
+
         .markdown a {
             color: #4ade80;
             text-decoration: underline;
         }
-        
+
         /* Animação de digitação */
         .typed-cursor {
             color: #4ade80;
@@ -493,51 +523,60 @@
     <style>
         /* Estilo de papel de caderno para mensagens da IA */
         .chat-bubble.bg-gray-800 {
-            background-color: #f5f2e8 !important; /* Cor bege para papel */
+            background-color: #f5f2e8 !important;
+            /* Cor bege para papel */
             color: #333 !important;
-            background-image: 
-                linear-gradient(#e1d9c8 1px, transparent 1px), /* Linhas horizontais */
-                radial-gradient(circle, #e1d9c8 1px, transparent 1px); /* Furos de caderno */
+            background-image:
+                linear-gradient(#e1d9c8 1px, transparent 1px),
+                /* Linhas horizontais */
+                radial-gradient(circle, #e1d9c8 1px, transparent 1px);
+            /* Furos de caderno */
             background-size: 100% 25px, 10px 10px;
             background-position: 0 0, 10px 10px;
-            border-left: 15px solid #e1d9c8; /* Margem esquerda */
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            border-left: 15px solid #e1d9c8;
+            /* Margem esquerda */
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px 30px !important;
         }
-        
+
         /* Estilo para títulos em Markdown */
-        .markdown h1, .markdown h2, .markdown h3 {
+        .markdown h1,
+        .markdown h2,
+        .markdown h3 {
             font-family: 'Bebas Neue', sans-serif !important;
             color: #333 !important;
-            border-bottom: 2px solid #ff6b35; /* Laranja da paleta */
+            border-bottom: 2px solid #ff6b35;
+            /* Laranja da paleta */
             padding-bottom: 5px;
             margin-top: 15px;
             margin-bottom: 10px;
         }
-        
+
         .markdown h1 {
             font-size: 1.8em;
         }
-        
+
         .markdown h2 {
             font-size: 1.5em;
         }
-        
+
         .markdown h3 {
             font-size: 1.3em;
         }
-        
+
         /* Ajuste para texto dentro do papel de caderno */
         .chat-bubble.bg-gray-800 .markdown {
             color: #333 !important;
         }
-        
+
         /* Ajuste para listas */
-        .markdown ul, .markdown ol {
+        .markdown ul,
+        .markdown ol {
             margin-left: 20px;
         }
     </style>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="fixed w-full z-50 bg-black bg-opacity-80 backdrop-filter backdrop-blur-lg">
@@ -552,18 +591,26 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#home" class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Início</a>
-                        <a href="#about" class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Sobre</a>
-                        <a href="#services" class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Serviços</a>
-                        <a href="#equipment" class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Equipamentos</a>
-                        <a href="#plans" class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Planos</a>
-                        <a href="#contact" class="bg-green-400 text-black px-6 py-2 rounded-full font-bold hover:bg-green-300 transition duration-300">Comece agora</a>
+                        <a href="#home"
+                            class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Início</a>
+                        <a href="#about"
+                            class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Sobre</a>
+                        <a href="#services"
+                            class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Serviços</a>
+                        <a href="#equipment"
+                            class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Equipamentos</a>
+                        <a href="#plans"
+                            class="text-white hover:text-green-400 px-3 py-2 text-sm font-medium transition duration-300">Planos</a>
+                        <a href="#contact"
+                            class="bg-green-400 text-black px-6 py-2 rounded-full font-bold hover:bg-green-300 transition duration-300">Comece
+                            agora</a>
                     </div>
                 </div>
                 <div class="md:hidden">
                     <button class="text-white focus:outline-none">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                 </div>
@@ -575,27 +622,10 @@
     <section id="home" class="relative bg-wallpaper">
         <div class="home">
             <div id="threejs-container">
-                <model-viewer
-                    src="./obj/bodybuilder.glb"
-                    alt="Athlete Model"
-                    class="model-viewer"
-                    camera-controls
-                    auto-rotate
-                    auto-rotate-delay="0"
-                    interaction-prompt="none"
-                    disable-pan
-                    disable-zoom
-                    disable-tap
-                    camera-target="0m 0.4m 0m"
-                    camera-orbit="0deg 90deg 3m"
-                    min-camera-orbit="auto 90deg 3m"
-                    max-camera-orbit="auto 90deg 3m"
-                    loading="eager"
-                    reveal="auto"
-                    shadow-intensity="1"
-                    ar
-                    autoplay
-                    >
+                <model-viewer src="./obj/bodybuilder.glb" alt="Athlete Model" class="model-viewer" camera-controls
+                    auto-rotate auto-rotate-delay="0" interaction-prompt="none" disable-pan disable-zoom disable-tap
+                    camera-target="0m 0.4m 0m" camera-orbit="0deg 90deg 3m" min-camera-orbit="auto 90deg 3m"
+                    max-camera-orbit="auto 90deg 3m" loading="eager" reveal="auto" shadow-intensity="1" ar autoplay>
                     <!-- Loading Overlay -->
                     <div slot="poster" class="loading-overlay">
                         <img src="./img/logo_vetor_2.webp" class="pulse-logo" alt="Logo loading" />
@@ -605,71 +635,101 @@
                 </model-viewer>
                 <!--<iframe class="character-athlete" title="Bodybuilder" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/c71fbc40dc6c4fdeabfb2d6686c87772/embed?autospin=1&autostart=1&camera=0&transparent=1"> </iframe>-->
             </div>
-            <div id="chat_ai" class="glass-card rounded-3xl w-11/12 md:w-4/5 lg:w-3/5 max-w-2xl mx-auto p-3 sm:p-4 md:p-5 lg:p-6" style="overflow: hidden !important; height: fit-content; max-height: 70%; display: flex; flex-direction: column; position: relative;">
+            <div id="chat_ai"
+                class="glass-card rounded-3xl w-11/12 md:w-4/5 lg:w-3/5 max-w-2xl mx-auto p-3 sm:p-4 md:p-5 lg:p-6"
+                style="overflow: hidden !important; height: fit-content; max-height: 70%; display: flex; flex-direction: column; position: relative;">
                 <div class="text-center mb-3 sm:mb-4 sticky top-0 bg-gray-900 bg-opacity-80 pt-2 pb-3 z-10 rounded-xl">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">
                         Planejamento de Carreira <span class="text-green-400">Atlética</span>
                     </h2>
                     <div class="flex items-center justify-center mt-2 mb-4 tutorial-box">
                         <div class="bg-gray-800 rounded-xl p-3 max-w-lg flex items-start">
-                            <svg class="w-5 h-5 text-green-400 mt-1 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <svg class="w-5 h-5 text-green-400 mt-1 mr-2 flex-shrink-0" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <p class="text-xs sm:text-sm text-gray-300">Preencha seus dados para receber um plano de carreira atlética personalizado <span class="text-green-400 font-bold">gratuitamente</span>. Nossa IA analisará seu perfil e criará estratégias específicas para seu esporte.</p>
+                            <p class="text-xs sm:text-sm text-gray-300">Preencha seus dados para receber um plano de
+                                carreira atlética personalizado <span
+                                    class="text-green-400 font-bold">gratuitamente</span>. Nossa IA analisará seu perfil
+                                e criará estratégias específicas para seu esporte.</p>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Formulário do usuário -->
                 <div id="user-form" class="transition-all duration-500 transform translate-x-0">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-sm text-gray-300 mb-1">Nome completo*</label>
-                            <input type="text" id="user-name" class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" placeholder="Seu nome completo">
+                            <input type="text" id="user-name"
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                placeholder="Seu nome completo">
                             <p class="text-red-400 text-xs mt-1 hidden" id="name-error">Nome é obrigatório</p>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-300 mb-1">WhatsApp*</label>
-                            <input type="tel" id="user-phone" class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" placeholder="(11) 98765-4321">
-                            <p class="text-red-400 text-xs mt-1 hidden" id="phone-error">WhatsApp válido é obrigatório</p>
+                            <input type="tel" id="user-phone"
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                placeholder="(11) 98765-4321">
+                            <p class="text-red-400 text-xs mt-1 hidden" id="phone-error">WhatsApp válido é obrigatório
+                            </p>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-300 mb-1">E-mail*</label>
-                            <input type="email" id="user-email" class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" placeholder="seu@email.com">
+                            <input type="email" id="user-email"
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                placeholder="seu@email.com">
                             <p class="text-red-400 text-xs mt-1 hidden" id="email-error">E-mail válido é obrigatório</p>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-300 mb-1">Esporte*</label>
-                            <input type="text" id="user-sport" class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" placeholder="Qual esporte você pratica?">
+                            <input type="text" id="user-sport"
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                placeholder="Qual esporte você pratica?">
                             <p class="text-red-400 text-xs mt-1 hidden" id="sport-error">Esporte é obrigatório</p>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-300 mb-1">Altura (cm)*</label>
-                            <input type="number" id="user-height" class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" placeholder="175">
+                            <input type="number" id="user-height"
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                placeholder="175">
                             <p class="text-red-400 text-xs mt-1 hidden" id="height-error">Altura é obrigatória</p>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-300 mb-1">Peso (kg)*</label>
-                            <input type="number" id="user-weight" class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" placeholder="70">
+                            <input type="number" id="user-weight"
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                placeholder="70">
                             <p class="text-red-400 text-xs mt-1 hidden" id="weight-error">Peso é obrigatório</p>
                         </div>
                     </div>
-                    <button id="start-chat" class="mt-3 bg-green-400 text-black px-4 py-2 rounded-xl font-bold hover:bg-green-300 transition duration-300 w-full">Começar Planejamento</button>
+                    <button id="start-chat"
+                        class="mt-3 bg-green-400 text-black px-4 py-2 rounded-xl font-bold hover:bg-green-300 transition duration-300 w-full">Começar
+                        Planejamento</button>
                 </div>
-                
+
                 <!-- Área do chat (inicialmente oculta) -->
-                <div id="chat-area" class="overflow-y-auto flex-grow flex flex-col transition-all duration-500 transform translate-x-full opacity-0 inset-0 pt-16" style="display: none; height: 100%; overflow-y: scroll !important; position: relative;">
+                <div id="chat-area"
+                    class="overflow-y-auto flex-grow flex flex-col transition-all duration-500 transform translate-x-full opacity-0 inset-0 pt-16"
+                    style="display: none; height: 100%; overflow-y: scroll !important; position: relative;">
                     <!-- Elemento de gradiente no topo -->
                     <div class="space-y-2 sm:space-y-3 flex-grow overflow-y-initial mb-3 px-1">
                         <!-- As mensagens serão adicionadas aqui -->
                     </div>
-                    
+
                     <div id="chat-input-area" class="mt-auto">
                         <div class="relative">
-                            <textarea class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400" style="padding: 20px; overflow-y: overlay; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); width: 90%; min-height: 150px; resize: none;" rows="2" placeholder="Descreva seus objetivos atléticos..."></textarea>
-                            <button class="absolute right-2 bottom-2 bg-green-400 text-black p-1 rounded-full hover:bg-green-300 transition duration-300">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            <textarea
+                                class="w-full bg-gray-800 rounded-xl p-2 text-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-green-400"
+                                style="padding: 20px; overflow-y: overlay; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); width: 90%; min-height: 150px; resize: none;"
+                                rows="2" placeholder="Descreva seus objetivos atléticos..."></textarea>
+                            <button
+                                class="absolute right-2 bottom-2 bg-green-400 text-black p-1 rounded-full hover:bg-green-300 transition duration-300">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                                 </svg>
                             </button>
                         </div>
@@ -678,8 +738,10 @@
             </div>
         </div>
         <div class="scroll-down">
-            <svg class="w-10 h-10 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            <svg class="w-10 h-10 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+                </path>
             </svg>
         </div>
     </section>
@@ -690,7 +752,7 @@
             <div class="gradient-overlay-left"></div>
             <div class="gradient-overlay-right"></div>
             <div class="carousel" id="carousel">
-            <!-- Cards will be generated by JavaScript -->
+                <!-- Cards will be generated by JavaScript -->
             </div>
         </div>
         <div class="max-w-7xl mx-auto">
@@ -699,18 +761,23 @@
                     <span class="highlight">AI-Powered</span> Career Acceleration
                 </h2>
                 <p class="text-xl text-gray-300 max-w-4xl mx-auto">
-                    We're revolutionizing how athletes build their brands using cutting-edge artificial intelligence and data-driven strategies.
+                    We're revolutionizing how athletes build their brands using cutting-edge artificial intelligence and
+                    data-driven strategies.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div class="glass-card rounded-3xl p-8">
                     <h3 class="text-3xl font-bold mb-6 text-green-400">Our Mission</h3>
                     <p class="text-gray-300 mb-6">
-                        At Future Athlete Agência, we believe every athlete deserves world-class branding and marketing support, regardless of their current level. Our AI-driven platform analyzes your performance, personality, and potential to create a customized growth strategy.
+                        At Future Athlete Agência, we believe every athlete deserves world-class branding and marketing
+                        support, regardless of their current level. Our AI-driven platform analyzes your performance,
+                        personality, and potential to create a customized growth strategy.
                     </p>
                     <p class="text-gray-300 mb-6">
-                        We combine machine learning with human creativity to produce content that resonates with fans, scouts, and sponsors alike. Our algorithms track engagement patterns across platforms to optimize your digital presence in real-time.
+                        We combine machine learning with human creativity to produce content that resonates with fans,
+                        scouts, and sponsors alike. Our algorithms track engagement patterns across platforms to
+                        optimize your digital presence in real-time.
                     </p>
                     <div class="flex space-x-4">
                         <div class="bg-green-400 bg-opacity-20 p-4 rounded-xl">
@@ -727,48 +794,61 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="relative">
                     <div class="glass-card rounded-3xl p-8">
                         <h3 class="text-3xl font-bold mb-6 text-orange-400">How Our AI Works</h3>
                         <div class="space-y-6">
                             <div class="flex items-start">
                                 <div class="bg-green-400 rounded-full p-2 mr-4">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
                                 <div>
                                     <h4 class="text-xl font-bold text-white mb-2">Performance Analysis</h4>
-                                    <p class="text-gray-300">Our system breaks down your game footage to identify strengths and areas for improvement.</p>
+                                    <p class="text-gray-300">Our system breaks down your game footage to identify
+                                        strengths and areas for improvement.</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <div class="bg-orange-400 rounded-full p-2 mr-4">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
                                 <div>
                                     <h4 class="text-xl font-bold text-white mb-2">Personality Profiling</h4>
-                                    <p class="text-gray-300">AI evaluates your interviews and social media to craft an authentic personal brand.</p>
+                                    <p class="text-gray-300">AI evaluates your interviews and social media to craft an
+                                        authentic personal brand.</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
                                 <div class="bg-green-400 rounded-full p-2 mr-4">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
                                 <div>
                                     <h4 class="text-xl font-bold text-white mb-2">Engagement Optimization</h4>
-                                    <p class="text-gray-300">Machine learning determines the best times, formats and platforms for your content.</p>
+                                    <p class="text-gray-300">Machine learning determines the best times, formats and
+                                        platforms for your content.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="absolute -bottom-8 -right-8 bg-green-400 w-32 h-32 rounded-full opacity-20 filter blur-3xl"></div>
-                    <div class="absolute -top-8 -left-8 bg-orange-400 w-32 h-32 rounded-full opacity-20 filter blur-3xl"></div>
+                    <div
+                        class="absolute -bottom-8 -right-8 bg-green-400 w-32 h-32 rounded-full opacity-20 filter blur-3xl">
+                    </div>
+                    <div
+                        class="absolute -top-8 -left-8 bg-orange-400 w-32 h-32 rounded-full opacity-20 filter blur-3xl">
+                    </div>
                 </div>
             </div>
         </div>
@@ -785,18 +865,23 @@
                     Comprehensive solutions tailored to elevate your athletic brand at every stage of your career.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Service Card 1 -->
-                <div class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
+                <div
+                    class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
                     <div class="bg-green-400 bg-opacity-20 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z">
+                            </path>
                         </svg>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-4">Brand Identity Creation</h3>
                     <p class="text-gray-300 mb-6">
-                        Craft a distinctive visual identity including logos, color schemes, typography, and brand guidelines that reflect your unique personality and athletic style.
+                        Craft a distinctive visual identity including logos, color schemes, typography, and brand
+                        guidelines that reflect your unique personality and athletic style.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Logo Design</span>
@@ -804,17 +889,22 @@
                         <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Merch Design</span>
                     </div>
                 </div>
-                
+
                 <!-- Service Card 2 -->
-                <div class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
+                <div
+                    class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
                     <div class="bg-orange-400 bg-opacity-20 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
                         </svg>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-4">Highlight Reel Production</h3>
                     <p class="text-gray-300 mb-6">
-                        Transform your game footage into cinematic highlight reels with professional editing, motion graphics, and AI-powered moment selection.
+                        Transform your game footage into cinematic highlight reels with professional editing, motion
+                        graphics, and AI-powered moment selection.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Game Footage</span>
@@ -822,35 +912,46 @@
                         <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Music Sync</span>
                     </div>
                 </div>
-                
+
                 <!-- Service Card 3 -->
-                <div class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
+                <div
+                    class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
                     <div class="bg-green-400 bg-opacity-20 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                            </path>
                         </svg>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-4">Social Media Growth</h3>
                     <p class="text-gray-300 mb-6">
-                        Our AI-driven social media management increases your following with optimized posting schedules, content strategies, and engagement techniques.
+                        Our AI-driven social media management increases your following with optimized posting schedules,
+                        content strategies, and engagement techniques.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Content Calendar</span>
                         <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Hashtag Strategy</span>
-                        <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Engagement Analysis</span>
+                        <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Engagement
+                            Analysis</span>
                     </div>
                 </div>
-                
+
                 <!-- Service Card 4 -->
-                <div class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
+                <div
+                    class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
                     <div class="bg-orange-400 bg-opacity-20 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                            </path>
                         </svg>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-4">Sponsorship Strategy</h3>
                     <p class="text-gray-300 mb-6">
-                        Develop compelling sponsorship proposals and identify ideal brand partnerships that align with your values and career goals.
+                        Develop compelling sponsorship proposals and identify ideal brand partnerships that align with
+                        your values and career goals.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Brand Matching</span>
@@ -858,17 +959,22 @@
                         <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Deal Negotiation</span>
                     </div>
                 </div>
-                
+
                 <!-- Service Card 5 -->
-                <div class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
+                <div
+                    class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
                     <div class="bg-green-400 bg-opacity-20 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                            </path>
                         </svg>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-4">Performance Analytics</h3>
                     <p class="text-gray-300 mb-6">
-                        Advanced tracking and visualization of your athletic metrics with AI-powered insights to improve performance and showcase progress.
+                        Advanced tracking and visualization of your athletic metrics with AI-powered insights to improve
+                        performance and showcase progress.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Data Tracking</span>
@@ -876,21 +982,27 @@
                         <span class="bg-gray-800 text-green-400 px-3 py-1 rounded-full text-sm">Skill Analysis</span>
                     </div>
                 </div>
-                
+
                 <!-- Service Card 6 -->
-                <div class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
+                <div
+                    class="service-card glass-card rounded-3xl p-8 transition duration-500 ease-in-out transform hover:-translate-y-2">
                     <div class="bg-orange-400 bg-opacity-20 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
                         </svg>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-4">Community Building</h3>
                     <p class="text-gray-300 mb-6">
-                        Create and nurture a loyal fanbase through exclusive content, interactive experiences, and strategic community engagement.
+                        Create and nurture a loyal fanbase through exclusive content, interactive experiences, and
+                        strategic community engagement.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Fan Engagement</span>
-                        <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Exclusive Content</span>
+                        <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Exclusive
+                            Content</span>
                         <span class="bg-gray-800 text-orange-400 px-3 py-1 rounded-full text-sm">Live Q&A</span>
                     </div>
                 </div>
@@ -906,15 +1018,18 @@
                     Pro-Grade <span class="highlight">Equipment</span>
                 </h2>
                 <p class="text-xl text-gray-300 max-w-4xl mx-auto">
-                    We capture your athletic journey with the same equipment used by top sports networks and production companies.
+                    We capture your athletic journey with the same equipment used by top sports networks and production
+                    companies.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Equipment 1 -->
-                <div class="equipment-card glass-card rounded-3xl p-6 hover:border-green-400 border border-transparent transition duration-300">
+                <div
+                    class="equipment-card glass-card rounded-3xl p-6 hover:border-green-400 border border-transparent transition duration-300">
                     <div class="bg-gray-800 rounded-2xl p-4 mb-6 flex justify-center">
-                        <img src="https://images.unsplash.com/photo-1563291074-2bfccc81ace6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="4K Camera" class="w-full h-48 object-contain rounded-xl">
+                        <img src="https://images.unsplash.com/photo-1563291074-2bfccc81ace6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+                            alt="4K Camera" class="w-full h-48 object-contain rounded-xl">
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2">Sony A7S III</h3>
                     <p class="text-gray-400 mb-4">4K 120fps Cinema Camera</p>
@@ -923,11 +1038,13 @@
                         <span class="text-white bg-gray-800 px-3 py-1 rounded-full text-sm">4K</span>
                     </div>
                 </div>
-                
+
                 <!-- Equipment 2 -->
-                <div class="equipment-card glass-card rounded-3xl p-6 hover:border-orange-400 border border-transparent transition duration-300">
+                <div
+                    class="equipment-card glass-card rounded-3xl p-6 hover:border-orange-400 border border-transparent transition duration-300">
                     <div class="bg-gray-800 rounded-2xl p-4 mb-6 flex justify-center">
-                        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Drone" class="w-full h-48 object-contain rounded-xl">
+                        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+                            alt="Drone" class="w-full h-48 object-contain rounded-xl">
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2">DJI Inspire 3</h3>
                     <p class="text-gray-400 mb-4">8K Aerial Cinematography</p>
@@ -936,11 +1053,13 @@
                         <span class="text-white bg-gray-800 px-3 py-1 rounded-full text-sm">8K</span>
                     </div>
                 </div>
-                
+
                 <!-- Equipment 3 -->
-                <div class="equipment-card glass-card rounded-3xl p-6 hover:border-green-400 border border-transparent transition duration-300">
+                <div
+                    class="equipment-card glass-card rounded-3xl p-6 hover:border-green-400 border border-transparent transition duration-300">
                     <div class="bg-gray-800 rounded-2xl p-4 mb-6 flex justify-center">
-                        <img src="https://images.unsplash.com/photo-1603912699214-92627f304eb6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Lens" class="w-full h-48 object-contain rounded-xl">
+                        <img src="https://images.unsplash.com/photo-1603912699214-92627f304eb6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+                            alt="Lens" class="w-full h-48 object-contain rounded-xl">
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2">Canon 70-200mm</h3>
                     <p class="text-gray-400 mb-4">f/2.8 Telephoto Lens</p>
@@ -949,11 +1068,13 @@
                         <span class="text-white bg-gray-800 px-3 py-1 rounded-full text-sm">IS</span>
                     </div>
                 </div>
-                
+
                 <!-- Equipment 4 -->
-                <div class="equipment-card glass-card rounded-3xl p-6 hover:border-orange-400 border border-transparent transition duration-300">
+                <div
+                    class="equipment-card glass-card rounded-3xl p-6 hover:border-orange-400 border border-transparent transition duration-300">
                     <div class="bg-gray-800 rounded-2xl p-4 mb-6 flex justify-center">
-                        <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Audio" class="w-full h-48 object-contain rounded-xl">
+                        <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+                            alt="Audio" class="w-full h-48 object-contain rounded-xl">
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2">Sennheiser MKH 416</h3>
                     <p class="text-gray-400 mb-4">Broadcast Quality Shotgun Mic</p>
@@ -963,46 +1084,59 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="mt-16 glass-card rounded-3xl p-8">
                 <div class="grid md:grid-cols-2 gap-8 items-center">
                     <div>
                         <h3 class="text-3xl font-bold text-white mb-4">Why Equipment Matters</h3>
                         <p class="text-gray-300 mb-6">
-                            Professional gear isn't just about specs—it's about capturing the emotion, intensity, and nuance of your performance. Our equipment ensures your content stands out with cinematic quality that commands attention.
+                            Professional gear isn't just about specs—it's about capturing the emotion, intensity, and
+                            nuance of your performance. Our equipment ensures your content stands out with cinematic
+                            quality that commands attention.
                         </p>
                         <ul class="space-y-4">
                             <li class="flex items-start">
                                 <div class="bg-green-400 rounded-full p-1 mr-4 mt-1">
-                                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-300">High dynamic range preserves details in shadows and highlights</span>
+                                <span class="text-gray-300">High dynamic range preserves details in shadows and
+                                    highlights</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="bg-green-400 rounded-full p-1 mr-4 mt-1">
-                                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
                                 <span class="text-gray-300">Slow motion captures the precision of your movements</span>
                             </li>
                             <li class="flex items-start">
                                 <div class="bg-green-400 rounded-full p-1 mr-4 mt-1">
-                                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </div>
-                                <span class="text-gray-300">Professional audio ensures your voice comes through clearly</span>
+                                <span class="text-gray-300">Professional audio ensures your voice comes through
+                                    clearly</span>
                             </li>
                         </ul>
                     </div>
                     <div class="relative">
                         <div class="bg-gray-800 rounded-2xl overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1543357481-d874897b2076?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Camera Setup" class="w-full h-auto">
+                            <img src="https://images.unsplash.com/photo-1543357481-d874897b2076?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+                                alt="Camera Setup" class="w-full h-auto">
                         </div>
-                        <div class="absolute -bottom-6 -right-6 bg-green-400 w-24 h-24 rounded-full opacity-20 filter blur-3xl"></div>
+                        <div
+                            class="absolute -bottom-6 -right-6 bg-green-400 w-24 h-24 rounded-full opacity-20 filter blur-3xl">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1017,13 +1151,15 @@
                     Flexible <span class="highlight">Plans</span>
                 </h2>
                 <p class="text-xl text-gray-300 max-w-4xl mx-auto">
-                    Choose the perfect package for your career stage and goals. All plans include our AI-powered analytics dashboard.
+                    Choose the perfect package for your career stage and goals. All plans include our AI-powered
+                    analytics dashboard.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Starter Plan -->
-                <div class="plan-card glass-card rounded-3xl p-8 transition duration-500 hover:border-green-400 border border-transparent">
+                <div
+                    class="plan-card glass-card rounded-3xl p-8 transition duration-500 hover:border-green-400 border border-transparent">
                     <div class="mb-6">
                         <h3 class="text-2xl font-bold text-white mb-2">Starter</h3>
                         <p class="text-gray-400">Ideal for emerging athletes</p>
@@ -1034,42 +1170,56 @@
                     </div>
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Basic Brand Identity</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">2 Highlight Reels/Month</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Social Media Strategy</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                             <span class="text-gray-500">Sponsorship Matching</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                             <span class="text-gray-500">Personal Brand Coach</span>
                         </li>
                     </ul>
-                    <button class="w-full bg-gray-800 text-white py-3 rounded-full font-bold hover:bg-gray-700 transition duration-300">Get Started</button>
+                    <button
+                        class="w-full bg-gray-800 text-white py-3 rounded-full font-bold hover:bg-gray-700 transition duration-300">Get
+                        Started</button>
                 </div>
-                
+
                 <!-- Pro Plan (Featured) -->
-                <div class="plan-card glass-card rounded-3xl p-8 border-2 border-green-400 transform scale-105 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-green-400 text-black px-4 py-1 text-sm font-bold">POPULAR</div>
+                <div
+                    class="plan-card glass-card rounded-3xl p-8 border-2 border-green-400 transform scale-105 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-green-400 text-black px-4 py-1 text-sm font-bold">POPULAR
+                    </div>
                     <div class="mb-6">
                         <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
                         <p class="text-gray-400">For serious competitors</p>
@@ -1080,41 +1230,54 @@
                     </div>
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Premium Brand Identity</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">4 Highlight Reels/Month</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Advanced Social Strategy</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Sponsorship Matching</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                             <span class="text-gray-500">Personal Brand Coach</span>
                         </li>
                     </ul>
-                    <button class="w-full bg-green-400 text-black py-3 rounded-full font-bold hover:bg-green-300 transition duration-300">Get Started</button>
+                    <button
+                        class="w-full bg-green-400 text-black py-3 rounded-full font-bold hover:bg-green-300 transition duration-300">Get
+                        Started</button>
                 </div>
-                
+
                 <!-- Elite Plan -->
-                <div class="plan-card glass-card rounded-3xl p-8 transition duration-500 hover:border-orange-400 border border-transparent">
+                <div
+                    class="plan-card glass-card rounded-3xl p-8 transition duration-500 hover:border-orange-400 border border-transparent">
                     <div class="mb-6">
                         <h3 class="text-2xl font-bold text-white mb-2">Elite</h3>
                         <p class="text-gray-400">Complete career management</p>
@@ -1125,46 +1288,61 @@
                     </div>
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Complete Brand Ecosystem</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Unlimited Highlight Reels</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Full Social Media Management</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Premium Sponsorship Deals</span>
                         </li>
                         <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="text-gray-300">Dedicated Brand Coach</span>
                         </li>
                     </ul>
-                    <button class="w-full bg-orange-400 text-black py-3 rounded-full font-bold hover:bg-orange-300 transition duration-300">Get Started</button>
+                    <button
+                        class="w-full bg-orange-400 text-black py-3 rounded-full font-bold hover:bg-orange-300 transition duration-300">Get
+                        Started</button>
                 </div>
             </div>
-            
+
             <div class="mt-16 text-center">
                 <h3 class="text-3xl font-bold text-white mb-6">Need something custom?</h3>
                 <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                    We offer one-time branding packages, video production services, and custom career development solutions.
+                    We offer one-time branding packages, video production services, and custom career development
+                    solutions.
                 </p>
-                <button class="bg-transparent border-2 border-green-400 text-green-400 px-8 py-3 rounded-full font-bold text-lg hover:bg-green-400 hover:text-black transition duration-300">Contact Our Team</button>
+                <button
+                    class="bg-transparent border-2 border-green-400 text-green-400 px-8 py-3 rounded-full font-bold text-lg hover:bg-green-400 hover:text-black transition duration-300">Contact
+                    Our Team</button>
             </div>
         </div>
     </section>
@@ -1230,12 +1408,14 @@
                     See how we've helped athletes at every level build their brands and accelerate their careers.
                 </p>
             </div>
-            
+
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Athlete 1 -->
                 <div class="athlete-card glass-card rounded-3xl overflow-hidden transition duration-500">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1541534741688-6078c6efb9a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Basketball Player" class="w-full h-full object-cover athlete-image transition duration-500">
+                        <img src="https://images.unsplash.com/photo-1541534741688-6078c6efb9a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+                            alt="Basketball Player"
+                            class="w-full h-full object-cover athlete-image transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
                         <div class="absolute bottom-4 left-4">
                             <h3 class="text-2xl font-bold text-white">Marcus Johnson</h3>
@@ -1257,31 +1437,43 @@
                                 <span class="text-gray-400 text-sm">Views</span>
                             </div>
                         </div>
-                        <p class="text-gray-300 mb-4">Went from college standout to G League to signing with a EuroLeague team in 18 months with our branding strategy.</p>
+                        <p class="text-gray-300 mb-4">Went from college standout to G League to signing with a
+                            EuroLeague team in 18 months with our branding strategy.</p>
                         <div class="flex space-x-2">
                             <a href="#" class="text-green-400 hover:text-green-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z">
+                                    </path>
                                 </svg>
                             </a>
                             <a href="#" class="text-green-400 hover:text-green-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                    </path>
                                 </svg>
                             </a>
                             <a href="#" class="text-green-400 hover:text-green-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z">
+                                    </path>
                                 </svg>
                             </a>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Athlete 2 -->
                 <div class="athlete-card glass-card rounded-3xl overflow-hidden transition duration-500">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Soccer Player" class="w-full h-full object-cover athlete-image transition duration-500">
+                        <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+                            alt="Soccer Player"
+                            class="w-full h-full object-cover athlete-image transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
                         <div class="absolute bottom-4 left-4">
                             <h3 class="text-2xl font-bold text-white">Sophia Rodriguez</h3>
@@ -1303,31 +1495,42 @@
                                 <span class="text-gray-400 text-sm">Views</span>
                             </div>
                         </div>
-                        <p class="text-gray-300 mb-4">Grew her social media following 800% in one season, leading to two local sponsorships and D1 scholarship offers.</p>
+                        <p class="text-gray-300 mb-4">Grew her social media following 800% in one season, leading to two
+                            local sponsorships and D1 scholarship offers.</p>
                         <div class="flex space-x-2">
                             <a href="#" class="text-orange-400 hover:text-orange-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z">
+                                    </path>
                                 </svg>
                             </a>
                             <a href="#" class="text-orange-400 hover:text-orange-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                    </path>
                                 </svg>
                             </a>
                             <a href="#" class="text-orange-400 hover:text-orange-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z">
+                                    </path>
                                 </svg>
                             </a>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Athlete 3 -->
                 <div class="athlete-card glass-card rounded-3xl overflow-hidden transition duration-500">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Swimmer" class="w-full h-full object-cover athlete-image transition duration-500">
+                        <img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+                            alt="Swimmer" class="w-full h-full object-cover athlete-image transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80"></div>
                         <div class="absolute bottom-4 left-4">
                             <h3 class="text-2xl font-bold text-white">Elijah Thompson</h3>
@@ -1349,16 +1552,23 @@
                                 <span class="text-gray-400 text-sm">Views</span>
                             </div>
                         </div>
-                        <p class="text-gray-300 mb-4">Our documentary-style content helped secure a swimwear sponsorship while still in high school.</p>
+                        <p class="text-gray-300 mb-4">Our documentary-style content helped secure a swimwear sponsorship
+                            while still in high school.</p>
                         <div class="flex space-x-2">
                             <a href="#" class="text-green-400 hover:text-green-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12 z"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12 z">
+                                    </path>
                                 </svg>
                             </a>
                             <a href="#" class="text-green-400 hover:text-green-300">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12 z"></path>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12 z">
+                                    </path>
                                 </svg>
                             </a>
                         </div>
@@ -1368,75 +1578,101 @@
         </div>
     </section>
     <!-- Footer Section -->
-<footer class="bg-black bg-opacity-70 backdrop-filter backdrop-blur-lg mt-20 py-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Coluna 1: Logo e Sobre -->
-            <div class="glass-card rounded-xl p-5 transition-all duration-300 hover:transform hover:scale-105">
-                <img src="./img/logo_vetor_2.webp" alt="Logo" class="w-16 mb-4">
-                <h3 class="text-green-400 text-xl font-bold mb-3">Future Athlete</h3>
-                <p class="text-gray-300 text-sm">Transformando atletas em marcas de sucesso através de estratégias de marketing impulsionadas por IA.</p>
-            </div>
-            
-            <!-- Coluna 2: Links Rápidos -->
-            <div class="glass-card rounded-xl p-5 transition-all duration-300 hover:transform hover:scale-105">
-                <h3 class="text-green-400 text-xl font-bold mb-3">Links Rápidos</h3>
-                <ul class="space-y-2">
-                    <li><a href="#home" class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span class="mr-2">→</span> Início</a></li>
-                    <li><a href="#about" class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span class="mr-2">→</span> Sobre</a></li>
-                    <li><a href="#services" class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span class="mr-2">→</span> Serviços</a></li>
-                    <li><a href="#plans" class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span class="mr-2">→</span> Planos</a></li>
-                </ul>
-            </div>
-            
-            <!-- Coluna 3: Contato -->
-            <div class="glass-card rounded-xl p-5 transition-all duration-300 hover:transform hover:scale-105">
-                <h3 class="text-green-400 text-xl font-bold mb-3">Contato</h3>
-                <div class="space-y-3">
-                    <a href="mailto:contato@futureathlete.com.br" class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                        </svg>
-                        contato@futureathlete.com.br
-                    </a>
-                    <a href="tel:+5511999999999" class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
-                        </svg>
-                        (11) 99999-9999
-                    </a>
+    <footer class="bg-black bg-opacity-70 backdrop-filter backdrop-blur-lg mt-20 py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Coluna 1: Logo e Sobre -->
+                <div class="glass-card rounded-xl p-5 transition-all duration-300 hover:transform hover:scale-105">
+                    <img src="./img/logo_vetor_2.webp" alt="Logo" class="w-16 mb-4">
+                    <h3 class="text-green-400 text-xl font-bold mb-3">Future Athlete</h3>
+                    <p class="text-gray-300 text-sm">Transformando atletas em marcas de sucesso através de estratégias
+                        de marketing impulsionadas por IA.</p>
                 </div>
-                <div class="mt-4 flex space-x-3">
-                    <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                        </svg>
-                    </a>
-                    <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/>
-                        </svg>
-                    </a>
-                    <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                        </svg>
-                    </a>
+
+                <!-- Coluna 2: Links Rápidos -->
+                <div class="glass-card rounded-xl p-5 transition-all duration-300 hover:transform hover:scale-105">
+                    <h3 class="text-green-400 text-xl font-bold mb-3">Links Rápidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home"
+                                class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span
+                                    class="mr-2">→</span> Início</a></li>
+                        <li><a href="#about"
+                                class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span
+                                    class="mr-2">→</span> Sobre</a></li>
+                        <li><a href="#services"
+                                class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span
+                                    class="mr-2">→</span> Serviços</a></li>
+                        <li><a href="#plans"
+                                class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center"><span
+                                    class="mr-2">→</span> Planos</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Contato -->
+                <div class="glass-card rounded-xl p-5 transition-all duration-300 hover:transform hover:scale-105">
+                    <h3 class="text-green-400 text-xl font-bold mb-3">Contato</h3>
+                    <div class="space-y-3">
+                        <a href="mailto:contato@futureathlete.com.br"
+                            class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                            </svg>
+                            contato@futureathlete.com.br
+                        </a>
+                        <a href="tel:+5511999999999"
+                            class="text-gray-300 hover:text-green-400 transition-colors duration-300 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
+                                </path>
+                            </svg>
+                            (11) 99999-9999
+                        </a>
+                    </div>
+                    <div class="mt-4 flex space-x-3">
+                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-gray-800">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-sm">&copy; 2025 Future Athlete. Todos os direitos reservados.</p>
+                    <div class="mt-4 md:mt-0 flex space-x-4">
+                        <a href="#"
+                            class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300">Política
+                            de Privacidade</a>
+                        <a href="#"
+                            class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300">Termos de
+                            Uso</a>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="mt-8 pt-8 border-t border-gray-800">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm">&copy; 2025 Future Athlete. Todos os direitos reservados.</p>
-                <div class="mt-4 md:mt-0 flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300">Política de Privacidade</a>
-                    <a href="#" class="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300">Termos de Uso</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
+    </footer>
 </body>
+
 </html>
